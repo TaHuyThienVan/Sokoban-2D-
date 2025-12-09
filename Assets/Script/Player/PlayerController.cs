@@ -5,9 +5,15 @@ public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 6f;
     public LayerMask blockingLayer;
-    bool isMoving = false;
 
+    bool isMoving = false;
     [SerializeField] private Animator animator;
+
+    void Start()
+    {
+        // Spawn dúng tâm ô
+        transform.position = GridUtils.Snap(transform.position);
+    }
 
     void Update()
     {
@@ -24,34 +30,36 @@ public class PlayerController : MonoBehaviour
             TryMove(dir);
     }
 
-    void TryMove(Vector2 direction)
+    void TryMove(Vector2 dir)
     {
-        Vector2 start = transform.position;
-        Vector2 target = start + direction;
+        Vector2 start = GridUtils.Snap(transform.position);
+        Vector2 target = start + dir;
 
-        RaycastHit2D hit = Physics2D.Raycast(start, direction, 1f, blockingLayer);
+        RaycastHit2D hit = Physics2D.Raycast(start, dir, 1f, blockingLayer);
 
+        // Ô phía tr??c không có v?t c?n
         if (hit.collider == null)
         {
-            animator.SetBool("isRunning", true);
+            animator?.SetBool("isRunning", true);
             StartCoroutine(MoveTo(target));
             return;
         }
 
+        // N?u là Box
         if (hit.collider.CompareTag("Box"))
         {
             BoxController box = hit.collider.GetComponent<BoxController>();
 
-            if (box.TryPush(direction))  
+            if (box.TryPush(dir))
             {
-                animator.SetTrigger("Push");   
-                animator.SetBool("isRunning", false); 
+                animator?.SetTrigger("Push");
+                animator?.SetBool("isRunning", false);
+
                 StartCoroutine(MoveTo(target));
             }
             else
             {
-          
-                animator.SetBool("isRunning", false);
+                animator?.SetBool("isRunning", false);
             }
         }
     }
@@ -60,18 +68,21 @@ public class PlayerController : MonoBehaviour
     {
         isMoving = true;
 
-        while ((Vector2)transform.position != target)
+        target = GridUtils.Snap(target);
+
+        while (((Vector2)transform.position - target).sqrMagnitude > 0.0001f)
         {
             transform.position = Vector2.MoveTowards(
-                                                            transform.position,
-                                                            target,
-                                                            moveSpeed * Time.deltaTime
-                                                        );
+                transform.position,
+                target,
+                moveSpeed * Time.deltaTime);
 
             yield return null;
         }
 
-        animator.SetBool("isRunning", false); 
+        transform.position = target;
+
+        animator?.SetBool("isRunning", false);
         isMoving = false;
     }
 }
