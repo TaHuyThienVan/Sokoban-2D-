@@ -51,7 +51,7 @@ MonoBehaviour:
   moveSpeed: 6
   blockingLayer:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 384
 --- !u!212 &7989259379127293434
 SpriteRenderer:
   m_ObjectHideFlags: 0

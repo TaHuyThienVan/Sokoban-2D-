@@ -5,17 +5,22 @@ public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 6f;
     public LayerMask blockingLayer;
+    public bool isFacingRight = true;
 
     bool isMoving = false;
     [SerializeField] private Animator animator;
 
     void Start()
     {
-        // Spawn dúng tâm ô
         transform.position = GridUtils.Snap(transform.position);
     }
 
     void Update()
+    {
+        HandleMoving();
+    }
+
+    void HandleMoving()
     {
         if (isMoving) return;
 
@@ -27,7 +32,24 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.D)) dir = Vector2.right;
 
         if (dir != Vector2.zero)
+        {
+            HandleFlip(dir);     // ? Thêm dòng này
             TryMove(dir);
+        }
+    }
+
+    void HandleFlip(Vector2 dir)
+    {
+        if (dir.x > 0)          // ?i sang ph?i
+        {
+            isFacingRight = true;
+            transform.localScale = new Vector3(1, 1, 1);
+        }
+        else if (dir.x < 0)     // ?i sang trái
+        {
+            isFacingRight = false;
+            transform.localScale = new Vector3(-1, 1, 1);
+        }
     }
 
     void TryMove(Vector2 dir)
@@ -37,7 +59,6 @@ public class PlayerController : MonoBehaviour
 
         RaycastHit2D hit = Physics2D.Raycast(start, dir, 1f, blockingLayer);
 
-        // Ô phía tr??c không có v?t c?n
         if (hit.collider == null)
         {
             animator?.SetBool("isRunning", true);
@@ -45,7 +66,6 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        // N?u là Box
         if (hit.collider.CompareTag("Box"))
         {
             BoxController box = hit.collider.GetComponent<BoxController>();
@@ -54,7 +74,6 @@ public class PlayerController : MonoBehaviour
             {
                 animator?.SetTrigger("Push");
                 animator?.SetBool("isRunning", false);
-
                 StartCoroutine(MoveTo(target));
             }
             else
