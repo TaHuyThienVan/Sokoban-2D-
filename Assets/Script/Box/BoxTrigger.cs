@@ -2,15 +2,30 @@ using UnityEngine;
 
 public class BoxTrigger : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public bool isOnGoal;
+
     void Start()
     {
-        
+        transform.position = GridUtils.Snap(transform.position);
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        
+        ObjectIdentity id = other.GetComponent<ObjectIdentity>();
+        if (id != null && id.type == ObjectType.Goal)
+        {
+            Debug.Log("BOX VÀO GOAL");
+            isOnGoal = true;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        ObjectIdentity id = other.GetComponent<ObjectIdentity>();
+        if (id != null && id.type == ObjectType.Goal)
+        {
+            Debug.Log("BOX R?I GOAL");
+            isOnGoal = false;
+        }
     }
 }

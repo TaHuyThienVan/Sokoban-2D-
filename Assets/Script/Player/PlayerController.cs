@@ -33,19 +33,19 @@ public class PlayerController : MonoBehaviour
 
         if (dir != Vector2.zero)
         {
-            HandleFlip(dir);     // ? Thêm dòng này
+            HandleFlip(dir);   
             TryMove(dir);
         }
     }
 
     void HandleFlip(Vector2 dir)
     {
-        if (dir.x > 0)          // ?i sang ph?i
+        if (dir.x > 0)          
         {
             isFacingRight = true;
             transform.localScale = new Vector3(1, 1, 1);
         }
-        else if (dir.x < 0)     // ?i sang trái
+        else if (dir.x < 0) 
         {
             isFacingRight = false;
             transform.localScale = new Vector3(-1, 1, 1);

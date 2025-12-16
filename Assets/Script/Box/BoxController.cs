@@ -10,7 +10,7 @@ public class BoxController : MonoBehaviour
 
     void Start()
     {
-        // Ép box vào ?úng tâm ô khi spawn
+        // Ép box vào dúng tâm ô khi spawn
         transform.position = GridUtils.Snap(transform.position);
     }
 
