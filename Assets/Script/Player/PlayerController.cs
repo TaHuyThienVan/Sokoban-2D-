@@ -58,6 +58,7 @@ public class PlayerController : MonoBehaviour
         Vector2 target = start + dir;
 
         RaycastHit2D hit = Physics2D.Raycast(start, dir, 1f, blockingLayer);
+        Debug.Log("Player hit: " + (hit.collider ? hit.collider.name : "NONE"));
 
         if (hit.collider == null)
         {
@@ -85,6 +86,7 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator MoveTo(Vector2 target)
     {
+        Debug.Log("test");
         isMoving = true;
 
         target = GridUtils.Snap(target);

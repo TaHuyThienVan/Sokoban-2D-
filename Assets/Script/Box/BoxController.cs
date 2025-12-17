@@ -4,50 +4,62 @@ using System.Collections;
 public class BoxController : MonoBehaviour
 {
     public float moveSpeed = 6f;
-    public LayerMask blockingLayer;
+
+    [Header("Sensors")]
+    public BoxSensor upSensor;
+    public BoxSensor downSensor;
+    public BoxSensor leftSensor;
+    public BoxSensor rightSensor;
 
     bool isMoving = false;
+    Vector2 moveDir;
 
     void Start()
     {
-        // Ép box vào dúng tâm ô khi spawn
         transform.position = GridUtils.Snap(transform.position);
     }
 
+    // ?? Player LUÔN ??y ???c box
     public bool TryPush(Vector2 dir)
     {
         if (isMoving) return false;
 
-        Vector2 start = GridUtils.Snap(transform.position);
-        Vector2 target = start + dir;
-
-        // Ki?m tra v?t c?n phía tr??c
-        RaycastHit2D hit = Physics2D.Raycast(start, dir, 1f, blockingLayer);
-        if (hit.collider != null)
-            return false;
+        moveDir = dir.normalized;
+        Vector2 target = GridUtils.Snap((Vector2)transform.position + moveDir);
 
         StartCoroutine(MoveTo(target));
-        return true;
+        return true; // ? C?C QUAN TR?NG
     }
 
     IEnumerator MoveTo(Vector2 target)
     {
         isMoving = true;
 
-        target = GridUtils.Snap(target);
-
-        // Dùng sqrMagnitude ?? tránh l?i float l?ch
         while (((Vector2)transform.position - target).sqrMagnitude > 0.0001f)
         {
+            // ? CH? SENSOR quy?t ??nh d?ng
+            if (IsBlocked(moveDir))
+                break;
+
             transform.position = Vector2.MoveTowards(
                 transform.position,
                 target,
                 moveSpeed * Time.deltaTime
             );
+
             yield return null;
         }
 
-        transform.position = target;
+        transform.position = GridUtils.Snap(transform.position);
         isMoving = false;
+    }
+
+    bool IsBlocked(Vector2 dir)
+    {
+        if (dir == Vector2.up) return upSensor.isBlocked;
+        if (dir == Vector2.down) return downSensor.isBlocked;
+        if (dir == Vector2.left) return leftSensor.isBlocked;
+        if (dir == Vector2.right) return rightSensor.isBlocked;
+        return false;
     }
 }
